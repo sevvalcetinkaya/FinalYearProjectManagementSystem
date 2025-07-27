@@ -1,0 +1,99 @@
+<div class="container my-5">
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">👤 Grup Kontenjanı</h6>
+    </div>
+    <div class="card-body">
+      <%= form_with url: update_group_quota_admin_setting_path, method: :patch, scope: :system_setting, local: true do |form| %>
+        <div class="mb-3">
+          <%= form.label :value, "Grup Kontenjanı (Kişi Sayısı)", class: "form-label" %>
+          <%= form.number_field :value, value: @group_quota.value || 3, min: 1, class: "form-control" %>
+        </div>
+        <%= form.submit "Kontenjanı Güncelle", class: "btn btn-outline-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">📅 Grup Oluşturma Son Tarihi</h6>
+    </div>
+    <div class="card-body">
+      <%= form_with url: admin_setting_path, method: :patch, scope: :system_setting, local: true do |form| %>
+        <div class="mb-3">
+          <%= form.label :value, "Son Tarih", class: "form-label" %>
+          <%= form.date_field :value, value: @deadline.value, class: "form-control" %>
+        </div>
+        <%= form.submit "Güncelle", class: "btn btn-outline-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <h4 class="mt-5">👥 Grup Oluşturmamış Öğrenciler</h4>
+
+  <% if @deadline.present? %>
+    <p><strong>Son tarih:</strong> <%= @deadline.value.to_date.strftime("%d.%m.%Y") %></p>
+
+    <% if @students_without_group.any? %>
+      <div class="table-responsive mb-3">
+        <table class="table table-striped table-bordered align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Ad Soyad</th>
+              <th>Öğrenci Numarası</th>
+              <th>Kayıt Tarihi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @students_without_group.each do |student| %>
+              <tr>
+                <td><%= student.full_name %></td>
+                <td><%= student.student_number %></td>
+                <td><%= student.created_at.strftime("%d.%m.%Y") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex gap-2 mb-4 flex-wrap">
+        <%= button_to "📧 E-Posta Gönder", email_unassigned_students_admin_setting_path, method: :post, class: "btn btn-outline-danger", data: { confirm: "Tüm öğrencilere e-posta gönderilecek. Emin misiniz?" } %>
+        <%= button_to "👥 Rastgele Grup Oluştur", random_group_students_admin_setting_path, method: :post, class: "btn btn-outline-success", data: { confirm: "Tüm grup oluşturmamış öğrenciler rastgele gruplandırılacak. Devam edilsin mi?" } %>
+      </div>
+    <% else %>
+      <div class="alert alert-success">Grubu olmayan öğrenci bulunmamaktadır.</div>
+    <% end %>
+  <% else %>
+    <div class="alert alert-warning">Henüz bir son tarih belirlenmemiş. Listeleme için lütfen bir tarih girin.</div>
+  <% end %>
+
+
+
+  <!-- Mevcut Gruplar (Sadece Başlık ve Tablo) -->
+  <h4 class="mt-4">📋 Mevcut Gruplar</h4>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Grup Adı</th>
+          <th>Grup Üyeleri</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @groups.each do |group| %>
+          <tr>
+            <td><%= group.name %></td>
+            <td>
+              <ul class="mb-0 ps-3">
+                <% group.students.each do |student| %>
+                  <li><%= student.full_name %> - <%= student.student_number %></li>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

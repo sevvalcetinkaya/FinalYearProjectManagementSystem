@@ -1,0 +1,67 @@
+<div class="alert alert-info">
+  <strong>OMÜ BPYS'ye Hoş Geldiniz!</strong><br>
+  Yapabilecekleriniz:<br>
+  • Arkadaşlarınız ile grup oluşturabilirsiniz. Grubu oluşturan öğrencinin grup lideri 
+  olarak atandığını ve kalan süreçte bütün işlemlerin grup lideri tarafından yapılacağını unutmayın! 
+  Diğer grup üyeleri de süreci sistemden takip edebilir.<br>
+  • İstediğiniz danışmana proje önerisinde bulunabilirsiniz.<br>
+  • Danışmanların sunduğu projeleri görüntüleyebilir ve bu projelere başvurabilirsiniz.<br>
+  • Atandığınız projeyi ve grup bilgilerinizi takip edebilirsiniz.
+</div>
+
+<h2 class="mb-4">Projeniz</h2>
+
+<% group = current_user.group %>
+<% project = group&.project %>
+
+<% if project.present?  %>
+  <% display_data = {
+    title: project&.title,
+    advisor: project&.advisor&.full_name,
+    group_name: group.name,
+    students: group.students,
+    description: project&.description,
+    status:  "Kabul Edildi",
+    status_class: "text-success"
+  } %>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <tbody>
+          <tr>
+            <th scope="row">Proje Başlığı</th>
+            <td><%= display_data[:title] %></td>
+          </tr>
+          <tr>
+            <th scope="row">Danışman</th>
+            <td><%= display_data[:advisor] %></td>
+          </tr>
+          <tr>
+            <th scope="row">Grup Adı</th>
+            <td><%= display_data[:group_name] %></td>
+          </tr>
+          <tr>
+            <th scope="row">Grup Üyeleri</th>
+            <td>
+              <ul class="mb-0">
+                <% display_data[:students].each do |user| %>
+                  <li><%= "#{user.full_name} - #{user.student_number}" %></li>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Durum</th>
+            <td><span class="<%= display_data[:status_class] %> fw-bold"><%= display_data[:status] %></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<% else %>
+  <div class="alert alert-info">
+    Henüz bir projeye atanmadınız.
+  </div>
+<% end %>
